@@ -1,8 +1,0 @@
-MONGODB_URI ="mongodb+srv://mazeAdmin:Lagkeneto1@cluster0.c8sod.mongodb.net"
-CLOUDINARY_API_KEY ="651735374912464"
-CLOUDINARY_API_SECRET ="L5ux0z_qQwfg0it5_Uh0tYhRzW0"
-CLOUDINARY_NAME ="dgw0tfbdt"
-JWT_SECRET = "mazeofficial"
-
-ADMIN_EMAIL = "mazeofficial@gmail.com"
-ADMIN_PASSWORD = "mazeofficial"
