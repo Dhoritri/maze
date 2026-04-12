@@ -81,7 +81,8 @@ const adminLogin = async (req, res) => {
       res.json({success:false,message:'Invalid email or password'})
     }
   } catch (error) {
-    
+    console.error(error);
+    res.json({success:false, message:error.message});
   }
 };
 

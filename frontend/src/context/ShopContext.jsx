@@ -1,4 +1,4 @@
-import { createContext, useEffect, useState } from "react";
+import { createContext, useEffect, useMemo, useState } from "react";
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
@@ -76,10 +76,17 @@ const ShopContextProvider = (props) => {
     }
   };
 
+  // O(1) product lookup map — rebuilt only when products list changes
+  const productMap = useMemo(() => {
+    const map = {};
+    products.forEach(p => { map[p._id] = p; });
+    return map;
+  }, [products]);
+
   const getCartAmount = () => {
     let totalAmount = 0;
     for (const productId in cartItems) {
-      const product = products.find((p) => p._id === productId);
+      const product = productMap[productId];
       if (!product) continue;
       for (const size in cartItems[productId]) {
         const quantity = cartItems[productId][size];
@@ -149,6 +156,7 @@ const ShopContextProvider = (props) => {
     backendUrl,
     setToken,
     token,
+    productMap,
   };
   return (
     <ShopContext.Provider value={value}>{props.children}</ShopContext.Provider>

@@ -8,6 +8,7 @@ import { toast } from "react-toastify";
 
 const PlaceOrder = () => {
   const [method, setMethod] = useState("cod");
+  const selectMethod = (m) => { setMethod(m); setPaymentDetails({ transactionId: "", paymentPhone: "" }); };
   const {
     navigate,
     backendUrl,
@@ -18,6 +19,7 @@ const PlaceOrder = () => {
     delivery_fee,
     products,
   } = useContext(ShopContext);
+  const [paymentDetails, setPaymentDetails] = useState({ transactionId: "", paymentPhone: "" });
   const [formData, setFormData] = useState({
     firstName: "",
     lastName: "",
@@ -78,23 +80,18 @@ const PlaceOrder = () => {
           break;
         }
         case "bkash": {
-          const transactionId = document.getElementById("transactionId").value;
-          const paymentPhone = document.getElementById("paymentPhone").value;
-
+          const { transactionId, paymentPhone } = paymentDetails;
           if (!transactionId || !paymentPhone) {
             toast.error("Transaction ID and Phone Number are required");
             return;
           }
-
           orderData.transactionId = transactionId;
           orderData.paymentPhone = paymentPhone;
-
           const response = await axios.post(
             backendUrl + "/api/order/bkash",
             orderData,
             { headers: { token } }
           );
-
           if (response.data.success) {
             setCartItems({});
             navigate("/orders");
@@ -104,23 +101,18 @@ const PlaceOrder = () => {
           break;
         }
         case "nagad": {
-          const transactionId = document.getElementById("transactionId").value;
-          const paymentPhone = document.getElementById("paymentPhone").value;
-
+          const { transactionId, paymentPhone } = paymentDetails;
           if (!transactionId || !paymentPhone) {
             toast.error("Transaction ID and Phone Number are required");
             return;
           }
-
           orderData.transactionId = transactionId;
           orderData.paymentPhone = paymentPhone;
-
           const response = await axios.post(
             backendUrl + "/api/order/nagad",
             orderData,
             { headers: { token } }
           );
-
           if (response.data.success) {
             setCartItems({});
             navigate("/orders");
@@ -249,7 +241,7 @@ const PlaceOrder = () => {
           {/* Payment Methods */}
           <div className="flex gap-3 flex-col lg:flex-row">
             <div
-              onClick={() => setMethod("bkash")}
+              onClick={() => selectMethod("bkash")}
               className="flex items-center gap-3 border p-2 px-3 cursor-pointer bg-white"
             >
               <p
@@ -260,7 +252,7 @@ const PlaceOrder = () => {
               <img className="h-5 mx-4" src={assets.bkash_logo} alt="bkash" />
             </div>
             <div
-              onClick={() => setMethod("nagad")}
+              onClick={() => selectMethod("nagad")}
               className="flex items-center gap-3 border p-2 px-3 cursor-pointer bg-white"
             >
               <p
@@ -271,7 +263,7 @@ const PlaceOrder = () => {
               <img className="h-5 mx-4" src={assets.nagad_logo} alt="nagad" />
             </div>
             <div
-              onClick={() => setMethod("cod")}
+              onClick={() => selectMethod("cod")}
               className="flex items-center gap-3 border p-2 px-3 cursor-pointer bg-white"
             >
               <p
@@ -289,15 +281,17 @@ const PlaceOrder = () => {
           {method === "bkash" && (
             <div className="mt-6">
               <input
-                id="paymentPhone"
                 type="text"
                 placeholder="Your bKash Account Number"
+                value={paymentDetails.paymentPhone}
+                onChange={(e) => setPaymentDetails(d => ({ ...d, paymentPhone: e.target.value }))}
                 className="border border-white rounded py-1.5 px-3.5 w-full mb-4"
               />
               <input
-                id="transactionId"
                 type="text"
                 placeholder="bKash Transaction ID"
+                value={paymentDetails.transactionId}
+                onChange={(e) => setPaymentDetails(d => ({ ...d, transactionId: e.target.value }))}
                 className="border border-white rounded py-1.5 px-3.5 w-full"
               />
             </div>
@@ -306,15 +300,17 @@ const PlaceOrder = () => {
           {method === "nagad" && (
             <div className="mt-6">
               <input
-                id="paymentPhone"
                 type="text"
                 placeholder="Your Nagad Account Number"
+                value={paymentDetails.paymentPhone}
+                onChange={(e) => setPaymentDetails(d => ({ ...d, paymentPhone: e.target.value }))}
                 className="border border-white rounded py-1.5 px-3.5 w-full mb-4"
               />
               <input
-                id="transactionId"
                 type="text"
                 placeholder="Nagad Transaction ID"
+                value={paymentDetails.transactionId}
+                onChange={(e) => setPaymentDetails(d => ({ ...d, transactionId: e.target.value }))}
                 className="border border-white rounded py-1.5 px-3.5 w-full"
               />
             </div>

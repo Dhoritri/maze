@@ -17,7 +17,11 @@ connectDB()
 connectCloudinary()
 //middleware
 app.use(express.json())
-app.use(cors())
+const allowedOrigins = [
+    process.env.FRONTEND_URL,
+    process.env.ADMIN_URL,
+].filter(Boolean);
+app.use(cors(allowedOrigins.length > 0 ? { origin: allowedOrigins, credentials: true } : {}))
 
 //api endpoints
 app.use('/api/user',userRouter)

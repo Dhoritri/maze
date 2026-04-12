@@ -98,7 +98,7 @@ const placeOrderNagad = async (req, res) => {
 //All ordeer data adminn paneel
 const allOrders = async (req, res) => {
   try {
-    const orders = await orderModel.find({});
+    const orders = await orderModel.find({}).lean();
     res.json({ success: true, orders });
   } catch (error) {
     console.log(error);
@@ -111,7 +111,7 @@ const userOrders = async (req, res) => {
   try {
     const { userId } = req.body;
 
-    const orders = await orderModel.find({ userId });
+    const orders = await orderModel.find({ userId }).lean();
     res.json({ success: true, orders });
   } catch (error) {
     console.log(error);

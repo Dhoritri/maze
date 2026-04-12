@@ -28,55 +28,36 @@ const [sortType,setSortType] = useState('relevant');
       setSubCategory((prev) => [...prev, e.target.value]);
     }
   }; 
-   const sortProduct = ()  => {
-      let fpCopy = filterProducts.slice();
-      switch (sortType){
-        case 'low-high':
-          setFilterProducts(fpCopy.sort((a,b)=>(a.price-b.price)));
-          break;
-        case 'high-low':
-          setFilterProducts(fpCopy.sort((a,b)=>(b.price-a.price)));
-          break;
-        default:
-          applyFilter();
-          break;
-      }
-    
-  }
   const applyFilter = () => {
     let productsCopy = products.slice();
 
-
-    if(showSearch && search){
-      productsCopy = productsCopy.filter((item) => item.name.toLowerCase().includes(search.toLowerCase()))
+    if (showSearch && search) {
+      productsCopy = productsCopy.filter((item) =>
+        item.name.toLowerCase().includes(search.toLowerCase())
+      );
     }
-
     if (category.length > 0) {
       productsCopy = productsCopy.filter((item) =>
         category.includes(item.category)
       );
     }
-
     if (subCategory.length > 0) {
       productsCopy = productsCopy.filter((item) =>
         subCategory.includes(item.subCategory)
       );
+    }
+    if (sortType === 'low-high') {
+      productsCopy.sort((a, b) => a.price - b.price);
+    } else if (sortType === 'high-low') {
+      productsCopy.sort((a, b) => b.price - a.price);
     }
 
     setFilterProducts(productsCopy);
   };
 
   useEffect(() => {
-    console.log(subCategory);
-  }, [subCategory]);
-
-  useEffect(() => {
     applyFilter();
-  }, [category, subCategory,search,showSearch,products]);
-
-  useEffect(()=> {
-    sortProduct();
-  },[sortType])
+  }, [category, subCategory, search, showSearch, products, sortType]);
   return (
     <div className="flex flex-col sm:flex-row gap-1 sm:gap-10 pt-10 ">
       {/* Filter Options */}

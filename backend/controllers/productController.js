@@ -42,7 +42,6 @@ const addProduct = async (req, res) => {
       date: Date.now(),
     };
 
-    console.log(productData);
     const product = new productModel(productData);
     await product.save();
     res.json({ success: true, message: "Product Added" });
@@ -67,10 +66,8 @@ const removeProduct = async (req, res) => {
     await productModel.findByIdAndDelete(req.body.id);
     res.json({ success: true, message: "Product Removed" });
   } catch (error) {
-    console.log(error);
+    console.error(error);
     res.json({ success: false, message: error.message });
-    console.log("Request body:", req.body);
-    console.log("Request files:", req.files);
   }
 };
 
