@@ -1,5 +1,7 @@
 import validator from "validator";
 import userModel from "../models/userModel.js";
+import orderModel from "../models/orderModel.js";
+import productModel from "../models/productModel.js";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import { randomBytes } from "crypto";
@@ -94,4 +96,60 @@ const adminLogin = async (req, res) => {
   }
 };
 
-export { loginUser, registerUser, googleAuth, adminLogin };
+const getProfile = async (req, res) => {
+  try {
+    const { userId } = req.body;
+    const user = await userModel.findById(userId).select("-password -cartData");
+    if (!user) return res.json({ success: false, message: "User not found" });
+
+    const orders = await orderModel.find({ userId });
+    const totalSpent = orders.reduce((sum, o) => sum + o.amount, 0);
+    const reviewCount = await productModel.countDocuments({ "reviews.userId": userId });
+
+    res.json({
+      success: true,
+      profile: {
+        name: user.name,
+        email: user.email,
+        isGoogleUser: !!user.googleId,
+        joinedAt: user._id.getTimestamp(),
+        orderCount: orders.length,
+        totalSpent,
+        reviewCount,
+      },
+    });
+  } catch (error) {
+    console.log(error);
+    res.json({ success: false, message: error.message });
+  }
+};
+
+const updateProfile = async (req, res) => {
+  try {
+    const { userId, name, currentPassword, newPassword } = req.body;
+    const user = await userModel.findById(userId);
+    if (!user) return res.json({ success: false, message: "User not found" });
+
+    if (name && name.trim()) {
+      user.name = name.trim();
+    }
+
+    if (newPassword) {
+      if (!currentPassword) return res.json({ success: false, message: "Current password required" });
+      if (user.googleId) return res.json({ success: false, message: "Google accounts cannot change password here" });
+      const isMatch = await bcrypt.compare(currentPassword, user.password);
+      if (!isMatch) return res.json({ success: false, message: "Current password is incorrect" });
+      if (newPassword.length < 6) return res.json({ success: false, message: "New password must be at least 6 characters" });
+      const salt = await bcrypt.genSalt(10);
+      user.password = await bcrypt.hash(newPassword, salt);
+    }
+
+    await user.save();
+    res.json({ success: true, message: "Profile updated", name: user.name });
+  } catch (error) {
+    console.log(error);
+    res.json({ success: false, message: error.message });
+  }
+};
+
+export { loginUser, registerUser, googleAuth, adminLogin, getProfile, updateProfile };

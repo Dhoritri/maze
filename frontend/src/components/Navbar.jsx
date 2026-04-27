@@ -72,7 +72,7 @@ const Navbar = () => {
                 <div className="absolute right-0 top-9 w-44 bg-[#1c1c1c] border border-white/8 shadow-2xl z-50">
                   <div className="py-1">
                     <button
-                      onClick={() => { setProfileOpen(false); }}
+                      onClick={() => { navigate("/profile"); setProfileOpen(false); }}
                       className="w-full text-left px-4 py-2.5 text-xs tracking-wide text-neutral-400 hover:text-white hover:bg-white/4 transition-colors"
                     >
                       My Profile
@@ -149,6 +149,12 @@ const Navbar = () => {
             </nav>
             {token && (
               <div className="border-t border-white/6 p-5 flex flex-col gap-1">
+                <button
+                  onClick={() => { navigate("/profile"); setVisible(false); }}
+                  className="text-left text-xs tracking-wide text-neutral-500 hover:text-white py-2 transition-colors"
+                >
+                  My Profile
+                </button>
                 <button
                   onClick={() => { navigate("/orders"); setVisible(false); }}
                   className="text-left text-xs tracking-wide text-neutral-500 hover:text-white py-2 transition-colors"
