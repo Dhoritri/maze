@@ -6,324 +6,146 @@ import { ShopContext } from "../context/ShopContext";
 import axios from "axios";
 import { toast } from "react-toastify";
 
+const inputCls =
+  "bg-transparent border border-white/10 text-white text-sm py-3 px-4 placeholder:text-neutral-700 focus:border-white/25 focus:outline-none transition-colors w-full";
+
 const PlaceOrder = () => {
   const [method, setMethod] = useState("cod");
   const selectMethod = (m) => { setMethod(m); setPaymentDetails({ transactionId: "", paymentPhone: "" }); };
-  const {
-    navigate,
-    backendUrl,
-    token,
-    cartItems,
-    setCartItems,
-    getCartAmount,
-    delivery_fee,
-    products,
-  } = useContext(ShopContext);
+  const { navigate, backendUrl, token, cartItems, setCartItems, getCartAmount, delivery_fee, products } = useContext(ShopContext);
   const [paymentDetails, setPaymentDetails] = useState({ transactionId: "", paymentPhone: "" });
   const [formData, setFormData] = useState({
-    firstName: "",
-    lastName: "",
-    email: "",
-    street: "",
-    city: "",
-    state: "",
-    zipcode: "",
-    phone: "",
-    country: "",
+    firstName: "", lastName: "", email: "", street: "",
+    city: "", state: "", zipcode: "", phone: "", country: "",
   });
 
-  const onChangeHandler = (event) => {
-    const name = event.target.name;
-    const value = event.target.value;
-    setFormData((data) => ({ ...data, [name]: value }));
-  };
+  const onChangeHandler = (e) => setFormData((d) => ({ ...d, [e.target.name]: e.target.value }));
 
-  const onSubmitHandler = async (event) => {
-    event.preventDefault();
+  const onSubmitHandler = async (e) => {
+    e.preventDefault();
     try {
       let orderItems = [];
-      for (const items in cartItems) {
-        for (const item in cartItems[items]) {
-          if (cartItems[items][item] > 0) {
-            const itemInfo = structuredClone(
-              products.find((product) => product._id === items)
-            );
-            if (itemInfo) {
-              itemInfo.size = item;
-              itemInfo.quantity = cartItems[items][item];
-              orderItems.push(itemInfo);
-            }
+      for (const id in cartItems) {
+        for (const size in cartItems[id]) {
+          if (cartItems[id][size] > 0) {
+            const item = structuredClone(products.find((p) => p._id === id));
+            if (item) { item.size = size; item.quantity = cartItems[id][size]; orderItems.push(item); }
           }
         }
       }
 
-      let orderData = {
-        address: formData,
-        items: orderItems,
-        amount: getCartAmount() + delivery_fee,
-      };
+      const orderData = { address: formData, items: orderItems, amount: getCartAmount() + delivery_fee };
+
+      const success = (data) => { setCartItems({}); navigate("/orders"); };
 
       switch (method) {
         case "cod": {
-          const response = await axios.post(
-            backendUrl + "/api/order/place",
-            orderData,
-            { headers: { token } }
-          );
-
-          if (response.data.success) {
-            setCartItems({});
-            navigate("/orders");
-          } else {
-            toast.error(response.data.message);
-          }
+          const { data } = await axios.post(backendUrl + "/api/order/place", orderData, { headers: { token } });
+          data.success ? success() : toast.error(data.message);
           break;
         }
         case "bkash": {
           const { transactionId, paymentPhone } = paymentDetails;
-          if (!transactionId || !paymentPhone) {
-            toast.error("Transaction ID and Phone Number are required");
-            return;
-          }
-          orderData.transactionId = transactionId;
-          orderData.paymentPhone = paymentPhone;
-          const response = await axios.post(
-            backendUrl + "/api/order/bkash",
-            orderData,
-            { headers: { token } }
-          );
-          if (response.data.success) {
-            setCartItems({});
-            navigate("/orders");
-          } else {
-            toast.error(response.data.message);
-          }
+          if (!transactionId || !paymentPhone) { toast.error("Account number and transaction ID required"); return; }
+          const { data } = await axios.post(backendUrl + "/api/order/bkash", { ...orderData, transactionId, paymentPhone }, { headers: { token } });
+          data.success ? success() : toast.error(data.message);
           break;
         }
         case "nagad": {
           const { transactionId, paymentPhone } = paymentDetails;
-          if (!transactionId || !paymentPhone) {
-            toast.error("Transaction ID and Phone Number are required");
-            return;
-          }
-          orderData.transactionId = transactionId;
-          orderData.paymentPhone = paymentPhone;
-          const response = await axios.post(
-            backendUrl + "/api/order/nagad",
-            orderData,
-            { headers: { token } }
-          );
-          if (response.data.success) {
-            setCartItems({});
-            navigate("/orders");
-          } else {
-            toast.error(response.data.message);
-          }
+          if (!transactionId || !paymentPhone) { toast.error("Account number and transaction ID required"); return; }
+          const { data } = await axios.post(backendUrl + "/api/order/nagad", { ...orderData, transactionId, paymentPhone }, { headers: { token } });
+          data.success ? success() : toast.error(data.message);
           break;
         }
-        default: {
-          toast.error("Invalid payment method selected");
-          break;
-        }
+        default: toast.error("Invalid payment method");
       }
     } catch (error) {
-      console.log(error);
       toast.error(error.message);
     }
   };
 
   return (
-    <form
-      onSubmit={onSubmitHandler}
-      className="flex flex-col sm:flex-row justify-between gap-4 pt-5 sm:pt-14 min-h-[80vh]"
-    >
-      {/* Left Side Information */}
-      <div className="flex flex-col gap-4 w-full sm:max-w-[480px]">
-        <div className="text-xl sm:text-2xl my-3">
-          <Title text1={"DELIVERY"} text2={"INFORMATION"} />
-        </div>
-        <div className="flex gap-3">
-          <input
-            required
-            onChange={onChangeHandler}
-            name="firstName"
-            value={formData.firstName}
-            type="text"
-            placeholder="First Name"
-            className="border border-white rounded py-1.5 px-3.5 w-full"
-          />
-          <input
-            required
-            onChange={onChangeHandler}
-            name="lastName"
-            value={formData.lastName}
-            type="text"
-            placeholder="Last Name"
-            className="border border-white rounded py-1.5 px-3.5 w-full"
-          />
-        </div>
-        <input
-          required
-          onChange={onChangeHandler}
-          name="email"
-          value={formData.email}
-          type="email"
-          placeholder="Email Address"
-          className="border border-white rounded py-1.5 px-3.5 w-full"
-        />
-        <input
-          required
-          onChange={onChangeHandler}
-          name="street"
-          value={formData.street}
-          type="text"
-          placeholder="Street"
-          className="border border-white rounded py-1.5 px-3.5 w-full"
-        />
-        <div className="flex gap-3">
-          <input
-            required
-            onChange={onChangeHandler}
-            name="city"
-            value={formData.city}
-            type="text"
-            placeholder="City"
-            className="border border-white rounded py-1.5 px-3.5 w-full"
-          />
-          <input
-            required
-            onChange={onChangeHandler}
-            name="state"
-            value={formData.state}
-            type="text"
-            placeholder="State"
-            className="border border-white rounded py-1.5 px-3.5 w-full"
-          />
-        </div>
-        <div className="flex gap-3">
-          <input
-            required
-            onChange={onChangeHandler}
-            name="zipcode"
-            value={formData.zipcode}
-            type="number"
-            placeholder="ZipCode"
-            className="border border-white rounded py-1.5 px-3.5 w-full"
-          />
-          <input
-            required
-            onChange={onChangeHandler}
-            name="country"
-            value={formData.country}
-            type="text"
-            placeholder="Country"
-            className="border border-white rounded py-1.5 px-3.5 w-full"
-          />
-        </div>
-        <input
-          required
-          onChange={onChangeHandler}
-          name="phone"
-          value={formData.phone}
-          type="number"
-          placeholder="Phone"
-          className="border border-white rounded py-1.5 px-3.5 w-full"
-        />
+    <form onSubmit={onSubmitHandler} className="pt-10 pb-24">
+      <div className="mb-10">
+        <Title text1="PLACE" text2="ORDER" />
       </div>
 
-      {/* Right Side */}
-      <div className="mt-8">
-        <div className="mt-8 min-w-80">
-          <CartTotal />
+      <div className="flex flex-col lg:flex-row gap-14">
+        {/* Left */}
+        <div className="flex-1">
+          <p className="text-[10px] tracking-[0.2em] text-neutral-600 uppercase mb-6">Delivery Information</p>
+          <div className="grid grid-cols-2 gap-3">
+            <input required name="firstName" value={formData.firstName} onChange={onChangeHandler} placeholder="First Name" className={inputCls} />
+            <input required name="lastName" value={formData.lastName} onChange={onChangeHandler} placeholder="Last Name" className={inputCls} />
+            <input required name="email" type="email" value={formData.email} onChange={onChangeHandler} placeholder="Email Address" className={`${inputCls} col-span-2`} />
+            <input required name="street" value={formData.street} onChange={onChangeHandler} placeholder="Street Address" className={`${inputCls} col-span-2`} />
+            <input required name="city" value={formData.city} onChange={onChangeHandler} placeholder="City" className={inputCls} />
+            <input required name="state" value={formData.state} onChange={onChangeHandler} placeholder="State" className={inputCls} />
+            <input required name="zipcode" type="number" value={formData.zipcode} onChange={onChangeHandler} placeholder="Zip Code" className={inputCls} />
+            <input required name="country" value={formData.country} onChange={onChangeHandler} placeholder="Country" className={inputCls} />
+            <input required name="phone" type="number" value={formData.phone} onChange={onChangeHandler} placeholder="Phone Number" className={`${inputCls} col-span-2`} />
+          </div>
+
+          {/* Payment */}
+          <p className="text-[10px] tracking-[0.2em] text-neutral-600 uppercase mt-10 mb-5">Payment Method</p>
+          <div className="flex flex-col sm:flex-row gap-2.5">
+            {[
+              { id: "bkash", logo: assets.bkash_logo },
+              { id: "nagad", logo: assets.nagad_logo },
+              { id: "cod", label: "CASH ON DELIVERY" },
+            ].map(({ id, logo, label }) => (
+              <button
+                key={id}
+                type="button"
+                onClick={() => selectMethod(id)}
+                className={`flex items-center gap-3 px-4 py-3 border text-sm transition-all ${
+                  method === id
+                    ? "border-[#FAB29E]/50 bg-[#FAB29E]/5"
+                    : "border-white/8 hover:border-white/20"
+                }`}
+              >
+                <span className={`w-2.5 h-2.5 rounded-full border flex-shrink-0 transition-colors ${
+                  method === id ? "border-[#FAB29E] bg-[#FAB29E]" : "border-white/25"
+                }`} />
+                {logo
+                  ? <img src={logo} className="h-5" alt={id} />
+                  : <span className="text-[10px] tracking-wider text-white">{label}</span>
+                }
+              </button>
+            ))}
+          </div>
+
+          {(method === "bkash" || method === "nagad") && (
+            <div className="mt-4 flex flex-col gap-3">
+              <input
+                type="text"
+                placeholder={`${method === "bkash" ? "bKash" : "Nagad"} Account Number`}
+                value={paymentDetails.paymentPhone}
+                onChange={(e) => setPaymentDetails((d) => ({ ...d, paymentPhone: e.target.value }))}
+                className={inputCls}
+              />
+              <input
+                type="text"
+                placeholder="Transaction ID"
+                value={paymentDetails.transactionId}
+                onChange={(e) => setPaymentDetails((d) => ({ ...d, transactionId: e.target.value }))}
+                className={inputCls}
+              />
+            </div>
+          )}
         </div>
-        <div className="mt-12">
-          <Title text1={"PAYMENT"} text2={"METHOD"} />
-          {/* Payment Methods */}
-          <div className="flex gap-3 flex-col lg:flex-row">
-            <div
-              onClick={() => selectMethod("bkash")}
-              className="flex items-center gap-3 border p-2 px-3 cursor-pointer bg-white"
-            >
-              <p
-                className={`min-w-3.5 h-3.5 border rounded-full border-black ${
-                  method === "bkash" ? "bg-[#292929]" : ""
-                }`}
-              ></p>
-              <img className="h-5 mx-4" src={assets.bkash_logo} alt="bkash" />
-            </div>
-            <div
-              onClick={() => selectMethod("nagad")}
-              className="flex items-center gap-3 border p-2 px-3 cursor-pointer bg-white"
-            >
-              <p
-                className={`min-w-3.5 h-3.5 border rounded-full border-black ${
-                  method === "nagad" ? "bg-[#292929]" : ""
-                }`}
-              ></p>
-              <img className="h-5 mx-4" src={assets.nagad_logo} alt="nagad" />
-            </div>
-            <div
-              onClick={() => selectMethod("cod")}
-              className="flex items-center gap-3 border p-2 px-3 cursor-pointer bg-white"
-            >
-              <p
-                className={`min-w-3.5 h-3.5 border rounded-full border-black ${
-                  method === "cod" ? "bg-[#292929]" : ""
-                }`}
-              ></p>
-              <p className="text-black text-sm font-medium mx-4">
-                CASH ON DELIVERY
-              </p>
-            </div>
-          </div>
 
-          {/* Conditional Inputs for Payment Details */}
-          {method === "bkash" && (
-            <div className="mt-6">
-              <input
-                type="text"
-                placeholder="Your bKash Account Number"
-                value={paymentDetails.paymentPhone}
-                onChange={(e) => setPaymentDetails(d => ({ ...d, paymentPhone: e.target.value }))}
-                className="border border-white rounded py-1.5 px-3.5 w-full mb-4"
-              />
-              <input
-                type="text"
-                placeholder="bKash Transaction ID"
-                value={paymentDetails.transactionId}
-                onChange={(e) => setPaymentDetails(d => ({ ...d, transactionId: e.target.value }))}
-                className="border border-white rounded py-1.5 px-3.5 w-full"
-              />
-            </div>
-          )}
-
-          {method === "nagad" && (
-            <div className="mt-6">
-              <input
-                type="text"
-                placeholder="Your Nagad Account Number"
-                value={paymentDetails.paymentPhone}
-                onChange={(e) => setPaymentDetails(d => ({ ...d, paymentPhone: e.target.value }))}
-                className="border border-white rounded py-1.5 px-3.5 w-full mb-4"
-              />
-              <input
-                type="text"
-                placeholder="Nagad Transaction ID"
-                value={paymentDetails.transactionId}
-                onChange={(e) => setPaymentDetails(d => ({ ...d, transactionId: e.target.value }))}
-                className="border border-white rounded py-1.5 px-3.5 w-full"
-              />
-            </div>
-          )}
-
-          <div className="w-full text-end mt-8">
-            <button
-              type="submit"
-              className="bg-black text-white px-16 py-3 text-sm hover:bg-[#FAB29E]"
-            >
-              Place Order
-            </button>
-          </div>
+        {/* Right */}
+        <div className="w-full lg:w-80 flex-shrink-0">
+          <p className="text-[10px] tracking-[0.2em] text-neutral-600 uppercase mb-6">Order Summary</p>
+          <CartTotal />
+          <button
+            type="submit"
+            className="w-full mt-5 bg-white text-black py-4 text-[11px] tracking-[0.2em] hover:bg-[#FAB29E] transition-colors"
+          >
+            PLACE ORDER
+          </button>
         </div>
       </div>
     </form>

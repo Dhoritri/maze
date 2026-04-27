@@ -1,30 +1,30 @@
 import { assets } from "../assets/assets";
 
+const policies = [
+  { icon: assets.exchange_icon, title: "Hassle-Free Exchange", desc: "No questions asked exchange on all orders." },
+  { icon: assets.quality_icon, title: "7-Day Returns", desc: "Easy, free returns within 7 days of delivery." },
+  { icon: assets.support_img, title: "24/7 Support", desc: "Our team is always here to help you." },
+];
+
 const OurPolicy = () => {
   return (
-    <>
-      {" "}
-      {/* Horizontal Line */}
-      <hr className="border-t border-gray-300 w-1/2 mx-auto" />{" "}
-      {/* Adjust the color and margins as needed */}
-      <div className="flex flex-col sm:flex-row justify-around gap-12 sm:gap-2 text-center py-20 text-xs sm:text-sm md:text-base text-gray-500">
-        <div>
-          <img src={assets.exchange_icon} className="w-12 m-auto mb-5" alt="" />
-          <p className="font-semibold text-[18px] text-white ">Exchange Policy</p>
-          <p className=" text-gray-200">We Offer No pera exchange policy</p>
-        </div>
-        <div>
-          <img src={assets.quality_icon} className="w-12 m-auto mb-5" alt="" />
-          <p className="font-semibold text-[18px] text-white ">7 Days Return Policy</p>
-          <p className="text-gray-200">We Provide 7 Days free return policy</p>
-        </div>
-        <div>
-          <img src={assets.support_img} className="w-12 m-auto mb-5" alt="" />
-          <p className="font-semibold text-[18px] text-white ">Best Customer Support</p>
-          <p className="text-gray-200">We Provide 24/7 customer Support</p>
-        </div>
+    <section className="py-20 border-t border-white/5">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-px bg-white/5">
+        {policies.map(({ icon, title, desc }) => (
+          <div
+            key={title}
+            className="flex flex-col items-center text-center gap-5 p-10 bg-[#191919] hover:bg-white/2 transition-colors"
+          >
+            <img src={icon} className="w-7 opacity-50" alt={title} />
+            <div>
+              <p className="text-white text-sm font-medium mb-2">{title}</p>
+              <p className="text-xs text-neutral-600 leading-relaxed">{desc}</p>
+            </div>
+          </div>
+        ))}
       </div>
-    </>
+    </section>
   );
 };
+
 export default OurPolicy;

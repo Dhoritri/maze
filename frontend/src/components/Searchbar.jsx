@@ -1,32 +1,38 @@
-import { useContext, useEffect, useState } from "react"
-import { ShopContext } from "../context/ShopContext"
+import { useContext, useEffect, useState } from "react";
+import { ShopContext } from "../context/ShopContext";
 import { assets } from "../assets/assets";
 import { useLocation } from "react-router-dom";
 
 const Searchbar = () => {
-  
-    const {search,setSearch,showSearch,setShowSearch} = useContext(ShopContext);
-    const [visible,setVisible] = useState(false)
-    const location = useLocation();
+  const { search, setSearch, showSearch, setShowSearch } = useContext(ShopContext);
+  const [visible, setVisible] = useState(false);
+  const location = useLocation();
 
-    useEffect(() =>{
-        
-        if(location.pathname.includes('collection')){
-            setVisible(true);
-        }
-        else{
-            setVisible(false);
-        }
-    },[location])
-    return showSearch && visible ?(
-    <div className="text-center">
-        <div className="inline-flex items-center justify-center border border-gray-400 px-6 py-2 my-5 mx-3 rounded-full w-3/4 sm:w-1/2">
-            <input value={search} onChange={(e)=>setSearch(e.target.value)} className="flex-1 outline-none bg-inherit text-sm text-white" type="text" placeholder="Search" />
-            <img className="w-6" src={assets.search_icon} alt="" />
-        </div>
-        <img className='inline w-3 cursor-pointer' onClick={()=> setShowSearch(false)} src={assets.cross_icon} alt="" />
+  useEffect(() => {
+    setVisible(location.pathname.includes("collection"));
+  }, [location]);
+
+  if (!showSearch || !visible) return null;
+
+  return (
+    <div className="flex items-center gap-3 px-4 py-3 border-b border-white/5 bg-[#191919]">
+      <img src={assets.search_icon} className="w-3.5 opacity-30 flex-shrink-0" alt="" />
+      <input
+        autoFocus
+        type="text"
+        value={search}
+        onChange={(e) => setSearch(e.target.value)}
+        placeholder="Search products..."
+        className="flex-1 bg-transparent text-sm text-white placeholder:text-neutral-700 outline-none"
+      />
+      <button
+        onClick={() => setShowSearch(false)}
+        className="opacity-30 hover:opacity-70 transition-opacity flex-shrink-0"
+      >
+        <img src={assets.cross_icon} className="w-3" alt="Close" />
+      </button>
     </div>
-  ): null
-}
+  );
+};
 
-export default Searchbar
+export default Searchbar;

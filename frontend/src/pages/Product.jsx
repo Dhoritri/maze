@@ -4,10 +4,11 @@ import { ShopContext } from "../context/ShopContext";
 import { assets } from "../assets/assets";
 import RelatedProducts from "../components/RelatedProducts";
 import optimizeCloudinaryUrl from "../utils/cloudinary";
+
 const Product = () => {
   const { productId } = useParams();
   const { currency, addToCart, productMap } = useContext(ShopContext);
-  const [productData, setProductData] = useState(false);
+  const [productData, setProductData] = useState(null);
   const [image, setImage] = useState("");
   const [size, setSize] = useState("");
 
@@ -19,123 +20,132 @@ const Product = () => {
     }
   }, [productId, productMap]);
 
-  return productData ? (
-    <div className=" pt-10 transition-opacity ease-in duration-500 opacity-100">
-      {/* product dattaa */}
-      <div className="flex gap-12 sm:gap-12 flex-col sm:flex-row">
-        {/* product images */}
+  if (!productData) return <div className="min-h-[60vh]" />;
+
+  return (
+    <div className="pt-10 pb-20">
+      <div className="flex gap-10 sm:gap-14 flex-col sm:flex-row">
+
+        {/* Images */}
         <div className="flex-1 flex flex-col-reverse gap-3 sm:flex-row">
-          <div className="flex sm:flex-col overflow-x-auto sm:overflow-y-scroll justify-between sm:justify-normal sm:w-[18.7%] w-full">
-            {productData.image.map((item, index) => (
-              <img
-                onClick={() => setImage(optimizeCloudinaryUrl(item, 800))}
-                src={optimizeCloudinaryUrl(item, 120)}
-                key={index}
-                className="w-[24%] sm:w-full sm:mb-3 flex-shrink-0 cursor-pointer"
-                alt=""
-                loading="lazy"
-              />
+          {/* Thumbnails */}
+          <div className="flex sm:flex-col overflow-x-auto sm:overflow-y-auto gap-2 sm:w-20 sm:max-h-[520px]">
+            {productData.image.map((img, i) => (
+              <button
+                key={i}
+                onClick={() => setImage(optimizeCloudinaryUrl(img, 800))}
+                className={`flex-shrink-0 border transition-colors overflow-hidden ${
+                  image === optimizeCloudinaryUrl(img, 800)
+                    ? "border-[#FAB29E]/60"
+                    : "border-white/5 hover:border-white/20"
+                }`}
+              >
+                <img
+                  src={optimizeCloudinaryUrl(img, 120)}
+                  className="w-16 h-20 sm:w-20 sm:h-24 object-cover"
+                  alt=""
+                  loading="lazy"
+                />
+              </button>
             ))}
           </div>
-          <div className="w-full sm:w-[80%]">
-            <img className="w-full h-auto" src={image} alt="products" />
+
+          {/* Main image */}
+          <div className="flex-1 bg-[#1a1a1a] overflow-hidden">
+            <img
+              src={image}
+              alt={productData.name}
+              className="w-full h-full object-cover object-top"
+              style={{ maxHeight: "600px" }}
+            />
           </div>
         </div>
-        {/* Product info */}
-        <div className="flex-1">
-          <h1 className="font-medium text-2xl mt-2 text-white">
-            {productData.name}
-          </h1>
-          <div className="flex items-center gap-1 mt-2">
-            <img src={assets.star_icon} alt="" className="w-3 5" />
-            <img src={assets.star_icon} alt="" className="w-3 5" />
-            <img src={assets.star_icon} alt="" className="w-3 5" />
-            <img src={assets.star_icon} alt="" className="w-3 5" />
-            <img src={assets.star_icon} alt="" className="w-3 5" />
-            <p className="pl-2 text-white">(199)</p>
+
+        {/* Info */}
+        <div className="flex-1 max-w-md">
+          <h1 className="text-2xl font-medium text-white mb-3">{productData.name}</h1>
+
+          {/* Stars */}
+          <div className="flex items-center gap-1 mb-5">
+            {[...Array(5)].map((_, i) => (
+              <img key={i} src={assets.star_icon} className="w-3" alt="" />
+            ))}
+            <span className="text-xs text-neutral-600 ml-2">(199)</span>
           </div>
-          <p className="text-gray-500 mt-5 text-3xl font-medium">
+
+          {/* Price */}
+          <div className="flex items-baseline gap-3 mb-6">
             {productData.discount > 0 ? (
               <>
-                <span className="text-red-500">
-                  {productData.discount}
-                  {currency}
-                </span>
-                <span className="text-sm text-gray-400 line-through ml-2">
-                  {productData.price}
-                  {currency}
-                </span>
+                <span className="text-2xl text-[#FAB29E] font-medium">{productData.discount}{currency}</span>
+                <span className="text-sm text-neutral-600 line-through">{productData.price}{currency}</span>
               </>
             ) : (
-              <>
-                {productData.price}
-                {currency}
-              </>
+              <span className="text-2xl text-white font-medium">{productData.price}{currency}</span>
             )}
-          </p>
+          </div>
 
-          <p className="mt-5 text-gray-300 md:w-4/5">
-            {productData.description}
-          </p>
-          <div className="flex flex-col gap-4 my-8">
-            <p className="text-white text-xl">Select Size</p>
-            <div className="flex gap-2 text-white">
-              {productData.sizes.map((item, index) => (
+          <p className="text-sm text-neutral-400 leading-relaxed mb-8">{productData.description}</p>
+
+          {/* Size */}
+          <div className="mb-8">
+            <p className="text-[10px] tracking-[0.2em] text-neutral-600 uppercase mb-4">Select Size</p>
+            <div className="flex flex-wrap gap-2">
+              {productData.sizes.map((s) => (
                 <button
-                  onClick={() => setSize(item)}
-                  className={`border py-2 px-4 bg-[#424242] ${
-                    item === size ? "border-orange-300" : ""
-                  } `}
-                  key={index}
+                  key={s}
+                  onClick={() => setSize(s)}
+                  className={`px-4 py-2 text-sm border transition-colors ${
+                    s === size
+                      ? "border-[#FAB29E] text-white bg-[#FAB29E]/5"
+                      : "border-white/10 text-neutral-500 hover:border-white/30 hover:text-white"
+                  }`}
                 >
-                  {item}
+                  {s}
                 </button>
               ))}
             </div>
           </div>
+
           <button
             onClick={() => addToCart(productData._id, size)}
-            className="bg-black text-white px-8 py-3 text-sm active:bg-gray-700"
+            className="w-full sm:w-auto bg-white text-black px-12 py-3.5 text-[11px] tracking-[0.2em] hover:bg-[#FAB29E] transition-colors font-medium"
           >
             ADD TO CART
           </button>
-          <hr className="mt-8 sm:w-4/5" />
-          <div className="text-sm text-gray-400 mt-5 flex flex-col gap-1">
-            <p>100% Organic Cotton</p>
-            <p>Cash On Delivery Is Available</p>
-            <p>Easy Return And Exchange Within 7 Days</p>
+
+          <div className="mt-8 pt-8 border-t border-white/5 flex flex-col gap-2 text-xs text-neutral-600">
+            <span>100% Organic Cotton</span>
+            <span>Cash On Delivery Available</span>
+            <span>Easy Return & Exchange Within 7 Days</span>
           </div>
         </div>
       </div>
-      {/* Description & review */}
+
+      {/* Description */}
       <div className="mt-20">
-        <div className="flex ">
-          <b className="border bg-slate-300 px-5 py-3 text-sm">Description</b>
-          <p className="border border-[#191919] bg-slate-300 px-5 py-3 text-sm">
+        <div className="flex gap-0 mb-0">
+          <button className="border-b border-white text-sm text-white px-5 py-2.5 font-medium">
+            Description
+          </button>
+          <button className="border-b border-white/10 text-sm text-neutral-600 px-5 py-2.5">
             Reviews
-          </p>
+          </button>
         </div>
-        <div className="flex flex-col gap-4 border px-6 py-6 text-sm text-gray-500">
-          <p>
-            We're a rising brand dedicated to delivering 100% organic cotton
-            products with unique designs and unparalleled comfort.
+        <div className="border border-t-0 border-white/5 px-5 py-6">
+          <p className="text-sm text-neutral-500 leading-relaxed mb-3">
+            We're a rising brand dedicated to delivering 100% organic cotton products with unique designs and
+            unparalleled comfort.
           </p>
-          <p>
-            Lorem ipsum dolor sit amet consectetur adipisicing elit. Repellendus
-            placeat vero in recusandae. Rerum ipsam, aliquid ducimus deleniti
-            debitis dolorum, molestiae beatae non laboriosam explicabo
-            reiciendis quibusdam nobis magnam hic.
+          <p className="text-sm text-neutral-600 leading-relaxed">
+            Every piece is crafted with care, ensuring softness, durability, and a style that stands out.
+            Wear it your way.
           </p>
         </div>
       </div>
-      {/* latest prodds */}
-      <RelatedProducts
-        category={productData.category}
-        subCategory={productData.subCategory}
-      ></RelatedProducts>
+
+      <RelatedProducts category={productData.category} subCategory={productData.subCategory} />
     </div>
-  ) : (
-    <div className="opacity-0"></div>
   );
 };
 

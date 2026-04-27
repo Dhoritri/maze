@@ -1,5 +1,4 @@
 import { useContext, useEffect, useState } from "react";
-
 import { ShopContext } from "../context/ShopContext";
 import Title from "./Title";
 import ProductItem from "./ProductItem";
@@ -9,31 +8,26 @@ const BestSeller = () => {
   const [bestSeller, setBestSeller] = useState([]);
 
   useEffect(() => {
-    const bestProduct = products.filter((item) => item.bestseller);
-    setBestSeller(bestProduct.slice(0, 6));
+    setBestSeller(products.filter((p) => p.bestseller).slice(0, 6));
   }, [products]);
+
   return (
-    <div className="my-10">
-      <div className="text-center text-3xl py-8">
-        <Title text1={"BEST"} text2={"SELLERS"} />
-        <p className="w-3/4 m-auto text-xs sm:text-sm md:text-base text-white">
-          Discover our top-selling products, carefully curated to bring you the
-          best of the best. From timeless minimalistic to trendy must-haves, our
-          best sellers are sure to impress.
+    <section className="py-20 border-t border-white/5">
+      <div className="flex flex-col sm:flex-row sm:items-end justify-between mb-12 gap-6">
+        <div>
+          <p className="text-[10px] tracking-[0.25em] text-neutral-600 uppercase mb-3">Most Loved</p>
+          <Title text1="BEST" text2="SELLERS" />
+        </div>
+        <p className="text-xs text-neutral-500 sm:text-right max-w-xs leading-relaxed">
+          Our most popular pieces, loved by the community.
         </p>
       </div>
-      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 gap-y-6 place-items-center">
+      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3 gap-y-8">
         {bestSeller.map((item, index) => (
-          <ProductItem
-            key={index}
-            id={item._id}
-            name={item.name}
-            image={item.image}
-            price={item.price}
-          />
+          <ProductItem key={index} id={item._id} image={item.image} name={item.name} price={item.price} />
         ))}
       </div>
-    </div>
+    </section>
   );
 };
 

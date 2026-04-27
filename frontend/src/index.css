@@ -3,36 +3,39 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
 :root {
-  font-family: "Satoshi";
+  font-family: "Satoshi", sans-serif;
   background-color: #191919;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
-::-webkit-scrollbar{
-  display: none;
+::-webkit-scrollbar {
+  width: 4px;
 }
-a:hover{
-  color: bisque;
-  
+::-webkit-scrollbar-track {
+  background: #191919;
+}
+::-webkit-scrollbar-thumb {
+  background: #2e2e2e;
+  border-radius: 2px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #444;
+}
 
-}
-a.active:hover{
-  color: bisque;
-
+*, *::before, *::after {
+  box-sizing: border-box;
 }
 
-a.active hr {
-  display: block;
+a {
+  text-decoration: none;
+  color: inherit;
 }
+
 .prata-regular {
   font-family: "Prata", serif;
   font-weight: 400;
   font-style: normal;
-}
-
-@media (max-width:640px){
-    a.active{
-        background-color: #191919;
-        color: #fff;
-    }
 }

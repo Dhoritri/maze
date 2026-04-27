@@ -1,67 +1,73 @@
 import { assets } from "../assets/assets";
-import { FaFacebookF, FaInstagram, FaTwitter } from "react-icons/fa"; // Import specific icons
-import { Link } from 'react-router-dom'; // Import Link for routing
+import { FaFacebookF, FaInstagram, FaTwitter } from "react-icons/fa";
+import { Link } from "react-router-dom";
 
 const Footer = () => {
   return (
-    <div>
-      <div className="flex flex-col sm:grid grid-cols-[3fr_1fr_1fr] gap-14 my-10 mt-40 text-sm">
+    <footer className="border-t border-white/5 mt-20">
+      <div className="grid grid-cols-1 sm:grid-cols-[2fr_1fr_1fr] gap-12 py-16">
         <div>
-          <img src={assets.logo} className="mb-5 w-28" alt="Maze Logo" />
-          <p className="w-full md:w-2/3 text-gray-300">
-            Discover the Maze, and experience true comfort. <br />
-            Crafted from 100% Organic Cotton for a soft, eco-friendly feel. <br />
-            Featuring premium-quality prints and embroidery for a sophisticated,
-            long-lasting finish.
+          <img src={assets.logo} className="w-24 mb-6" alt="Maze" />
+          <p className="text-xs text-neutral-500 leading-relaxed max-w-xs">
+            Crafted from 100% organic cotton with premium embroidery and prints.
+            Fashion that respects comfort and the planet.
           </p>
-        </div>
-        <div>
-          <p className="text-white text-xl font-medium mb-5">COMPANY</p>
-          <ul className="flex flex-col gap-1">
-            <li className="transition duration-300 text-[#E6E8E6] hover:text-[#FAB29E] hover:translate-x-2">
-              <Link to="/">Home</Link>
-            </li>
-            <li className="transition-transform duration-300 text-[#E6E8E6] hover:text-[#FAB29E] hover:translate-x-2">
-              <Link to="/about">About Us</Link>
-            </li>
-            <li className="transition-transform duration-300 text-[#E6E8E6] hover:text-[#FAB29E] hover:translate-x-2">
-              <Link to="/orders">Orders</Link>
-            </li>
-            <li className="transition-transform duration-300 text-[#E6E8E6] hover:text-[#FAB29E] hover:translate-x-2">
-              <Link to="/policy">Privacy Policy</Link>
-            </li>
-          </ul>
-        </div>
-        <div>
-          <p className="text-white text-xl font-medium mb-5">GET IN TOUCH</p>
-          <ul className="flex flex-col gap-1 mb-5">
-            <li className="transition-transform duration-300 text-[#E6E8E6] ">
-              +880 01796582064
-            </li>
-            <li className="transition-transform duration-300 text-[#E6E8E6] ">
-              officialmazemaze@gmail.com
-            </li>
-          </ul>
-          <div className="flex justify-start space-x-4">
-            <a href="https://www.facebook.com/mazee.inc" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:text-blue-700">
-              <FaFacebookF size={20} />
-            </a>
-            <a href="https://instagram.com/mmaze.official" target="_blank" rel="noopener noreferrer" className="text-pink-500 hover:text-pink-700">
-              <FaInstagram size={20} />
-            </a>
-            <a href="#twitter" target="_blank" rel="noopener noreferrer" className="text-white hover:text-gray-500">
-              <FaTwitter size={20} />
-            </a>
+          <div className="flex gap-3 mt-6">
+            {[
+              { href: "https://www.facebook.com/mazee.inc", Icon: FaFacebookF },
+              { href: "https://instagram.com/mmaze.official", Icon: FaInstagram },
+              { href: "#", Icon: FaTwitter },
+            ].map(({ href, Icon }) => (
+              <a
+                key={href}
+                href={href}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="w-8 h-8 border border-white/8 flex items-center justify-center text-neutral-600 hover:text-white hover:border-white/25 transition-colors"
+              >
+                <Icon size={12} />
+              </a>
+            ))}
           </div>
         </div>
+
+        <div>
+          <p className="text-[10px] tracking-[0.2em] text-neutral-600 uppercase mb-5">Navigate</p>
+          <ul className="flex flex-col gap-3">
+            {[
+              ["Home", "/"],
+              ["Collection", "/collection"],
+              ["About", "/about"],
+              ["Orders", "/orders"],
+              ["Privacy Policy", "/policy"],
+            ].map(([label, path]) => (
+              <li key={path}>
+                <Link
+                  to={path}
+                  className="text-xs text-neutral-500 hover:text-white transition-colors"
+                >
+                  {label}
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </div>
+
+        <div>
+          <p className="text-[10px] tracking-[0.2em] text-neutral-600 uppercase mb-5">Contact</p>
+          <ul className="flex flex-col gap-3 text-xs text-neutral-500">
+            <li>+880 01796582064</li>
+            <li>officialmazemaze@gmail.com</li>
+          </ul>
+        </div>
       </div>
-      <div>
-        <hr />
-        <p className="text-white py-5 text-sm text-center">
-          Copyright 2024 @ mazewears.com - All Rights Reserved
+
+      <div className="border-t border-white/5 py-6">
+        <p className="text-[10px] tracking-[0.2em] text-neutral-700 text-center uppercase">
+          © 2024 Mazewears — All Rights Reserved
         </p>
       </div>
-    </div>
+    </footer>
   );
 };
 
