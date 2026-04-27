@@ -3,6 +3,7 @@ import { ShopContext } from "../context/ShopContext";
 import Title from "../components/Title";
 import { assets } from "../assets/assets";
 import CartTotal from "../components/CartTotal";
+import optimizeCloudinaryUrl from "../utils/cloudinary";
 
 const Cart = () => {
   const { products, currency, cartItems, updateQuantity, navigate } = useContext(ShopContext);
@@ -49,9 +50,10 @@ const Cart = () => {
             >
               <div className="flex items-start gap-6">
                 <img
-                  src={productData.image[0]}
+                  src={optimizeCloudinaryUrl(productData.image[0], 120)}
                   className="w-16 sm:w-20"
                   alt={productData.name}
+                  loading="lazy"
                 />
                 <div>
                   <p className="text-large sm:text-large font-medium">

@@ -1,7 +1,8 @@
 import { useContext, useEffect, useState } from "react";
 import { ShopContext } from "../context/ShopContext";
 import Title from "../components/Title";
-import axios from 'axios'
+import axios from 'axios';
+import optimizeCloudinaryUrl from "../utils/cloudinary";
 
 const Orders = () => {
   const { backendUrl, token, currency } = useContext(ShopContext);
@@ -48,7 +49,7 @@ const Orders = () => {
             className="py-4 border-t border-b text-gray-100 flex flex-col md:flex-row md:items-center md:justify-between gap-4"
           >
             <div className="flex items-start gap-6 text-sm">
-              <img src={item.image[0]} className="w-20 sm:w-24" />
+              <img src={optimizeCloudinaryUrl(item.image[0], 120)} className="w-20 sm:w-24" loading="lazy" alt={item.name} />
               <div>
                 <p className="sm:text-base font-bold ">{item.name}</p>
                 <div className="flex items-center gap-3 mt-1 text-base text-white">

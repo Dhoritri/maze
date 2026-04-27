@@ -9,8 +9,8 @@ const orderSchema = new mongoose.Schema({
     paymentMethod: { type: String, required: true },
     payment: { type: Boolean, required: true, default: false },
     date: { type: Number, required: true },
-    transactionId: { type: String, required:true, default: null }, // For bKash/Nagad Transaction ID
-    paymentPhone: { type: String,required:true, default: null }   // For bKash/Nagad Phone Number
+    transactionId: { type: String, default: null },
+    paymentPhone: { type: String, default: null }
 });
 
 const orderModel = mongoose.models.order || mongoose.model('order', orderSchema);

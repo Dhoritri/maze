@@ -3,6 +3,7 @@ import { useParams } from "react-router-dom";
 import { ShopContext } from "../context/ShopContext";
 import { assets } from "../assets/assets";
 import RelatedProducts from "../components/RelatedProducts";
+import optimizeCloudinaryUrl from "../utils/cloudinary";
 const Product = () => {
   const { productId } = useParams();
   const { currency, addToCart, productMap } = useContext(ShopContext);
@@ -14,7 +15,7 @@ const Product = () => {
     const item = productMap[productId];
     if (item) {
       setProductData(item);
-      setImage(item.image[0]);
+      setImage(optimizeCloudinaryUrl(item.image[0], 800));
     }
   }, [productId, productMap]);
 
@@ -27,11 +28,12 @@ const Product = () => {
           <div className="flex sm:flex-col overflow-x-auto sm:overflow-y-scroll justify-between sm:justify-normal sm:w-[18.7%] w-full">
             {productData.image.map((item, index) => (
               <img
-                onClick={() => setImage(item)}
-                src={item}
+                onClick={() => setImage(optimizeCloudinaryUrl(item, 800))}
+                src={optimizeCloudinaryUrl(item, 120)}
                 key={index}
                 className="w-[24%] sm:w-full sm:mb-3 flex-shrink-0 cursor-pointer"
                 alt=""
+                loading="lazy"
               />
             ))}
           </div>
