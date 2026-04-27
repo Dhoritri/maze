@@ -12,6 +12,7 @@ const NAV_LINKS = [
 
 const Navbar = () => {
   const [visible, setVisible] = useState(false);
+  const [profileOpen, setProfileOpen] = useState(false);
   const { setShowSearch, getCartCount, navigate, token, setToken, setCartItems } = useContext(ShopContext);
 
   const logout = () => {
@@ -57,34 +58,40 @@ const Navbar = () => {
           </button>
 
           {/* Profile dropdown */}
-          <div className="relative group">
+          <div className="relative">
             <button
-              onClick={() => !token && navigate("/login")}
+              onClick={() => token ? setProfileOpen(o => !o) : navigate("/login")}
               className="text-neutral-500 hover:text-white transition-colors"
               aria-label="Profile"
             >
               <img src={assets.profile_icon} className="w-[18px]" alt="" />
             </button>
-            {token && (
-              <div className="absolute right-0 top-9 w-44 bg-[#1c1c1c] border border-white/8 shadow-2xl hidden group-hover:block z-50">
-                <div className="py-1">
-                  <button className="w-full text-left px-4 py-2.5 text-xs tracking-wide text-neutral-400 hover:text-white hover:bg-white/4 transition-colors">
-                    My Profile
-                  </button>
-                  <button
-                    onClick={() => navigate("/orders")}
-                    className="w-full text-left px-4 py-2.5 text-xs tracking-wide text-neutral-400 hover:text-white hover:bg-white/4 transition-colors"
-                  >
-                    Orders
-                  </button>
-                  <button
-                    onClick={logout}
-                    className="w-full text-left px-4 py-2.5 text-xs tracking-wide text-neutral-400 hover:text-white hover:bg-white/4 transition-colors"
-                  >
-                    Sign Out
-                  </button>
+            {token && profileOpen && (
+              <>
+                <div className="fixed inset-0 z-40" onClick={() => setProfileOpen(false)} />
+                <div className="absolute right-0 top-9 w-44 bg-[#1c1c1c] border border-white/8 shadow-2xl z-50">
+                  <div className="py-1">
+                    <button
+                      onClick={() => { setProfileOpen(false); }}
+                      className="w-full text-left px-4 py-2.5 text-xs tracking-wide text-neutral-400 hover:text-white hover:bg-white/4 transition-colors"
+                    >
+                      My Profile
+                    </button>
+                    <button
+                      onClick={() => { navigate("/orders"); setProfileOpen(false); }}
+                      className="w-full text-left px-4 py-2.5 text-xs tracking-wide text-neutral-400 hover:text-white hover:bg-white/4 transition-colors"
+                    >
+                      Orders
+                    </button>
+                    <button
+                      onClick={() => { logout(); setProfileOpen(false); }}
+                      className="w-full text-left px-4 py-2.5 text-xs tracking-wide text-neutral-400 hover:text-white hover:bg-white/4 transition-colors"
+                    >
+                      Sign Out
+                    </button>
+                  </div>
                 </div>
-              </div>
+              </>
             )}
           </div>
 
