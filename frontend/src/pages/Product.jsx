@@ -51,12 +51,11 @@ const Product = () => {
           </div>
 
           {/* Main image */}
-          <div className="flex-1 bg-[#1a1a1a] overflow-hidden">
+          <div className="flex-1 bg-[#1a1a1a] flex items-center justify-center overflow-hidden" style={{ maxHeight: "600px" }}>
             <img
               src={image}
               alt={productData.name}
-              className="w-full h-full object-cover object-top"
-              style={{ maxHeight: "600px" }}
+              className="w-full h-full object-contain"
             />
           </div>
         </div>
